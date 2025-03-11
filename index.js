@@ -1,5 +1,6 @@
 // back/index.js
 const express = require("express");
+const annoncesRoutes = require("./routes/annonces");
 const app = express();
 const port = 3001;
 
@@ -37,4 +38,7 @@ client.connect()
     }
     client.end(); // Ferme la connexion après la requête
   });
-  
+
+
+  app.use(express.json());
+  app.use("/annonces", annoncesRoutes);
