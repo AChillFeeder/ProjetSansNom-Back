@@ -1,15 +1,21 @@
-const mysql = require("mysql2");
+const { Pool } = require("pg");
 
-const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+const pool = new Pool({
+  host: "bqjcnth2wjbsrtul4ddr-postgresql.services.clever-cloud.com",
+  user: "ua1workgvspqvscz1zmd",
+  password: "idSSNIIMhqP61WESLukA",
+  database: "bqjcnth2wjbsrtul4ddr",
+  port: 7332,
+  max: 10,
 });
 
-const promisePool = pool.promise();
+pool.connect()
+  .then((client) => {
+    console.log("✅ Connecté à PostgreSQL");
+    client.release();
+  })
+  .catch((err) => {
+    console.error("❌ Erreur de connexion PostgreSQL :", err.stack);
+  });
 
-module.exports = promisePool;
+module.exports = pool;
