@@ -20,7 +20,7 @@ app.get("/healthcheck", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
-app.use("/annonces", annoncesRoutes);
+app.use("/api/annonces", annoncesRoutes);
 
 app.get("/api/all-users", userController.getAllUsers);
 
