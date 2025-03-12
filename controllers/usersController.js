@@ -42,9 +42,11 @@ exports.login = async (req, res) => {
         console.log(email, password);
 
         const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
+
         if (user.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
+        console.log('Found user');
 
         // const validPassword = await bcrypt.compare(password, user[0].password);
         // if (!validPassword) {
