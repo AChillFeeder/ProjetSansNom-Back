@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const pool = require("../db/db_config");
 
 // Récupérer toutes les annonces
 exports.getAllAnnonces = async (req, res) => {
