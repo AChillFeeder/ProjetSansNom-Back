@@ -9,7 +9,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Tous les champs sont requis." });
         }
 
-        const [existingUser] = await db.query("SELECT * FROM Utilisateurs WHERE email = ?", [email]);
+        const [existingUser] = await db.query("SELECT * FROM utilisateurs WHERE email = ?", [email]);
         if (existingUser.length > 0) {
             return res.status(400).json({ message: "Cet email est déjà utilisé." });
         }
@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
         const type_compte = 1;
 
         await db.query(
-            "INSERT INTO Utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES (?, ?, ?, ?, ?, ?)",
             [nom, prenom, email, hashedPassword, 1, type_compte]
         );
 
@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const [user] = await db.query("SELECT * FROM Utilisateurs WHERE email = ?", [email]);
+        const [user] = await db.query("SELECT * FROM utilisateurs WHERE email = ?", [email]);
         if (user.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
@@ -53,8 +53,8 @@ exports.login = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const [users] = await db.query("SELECT id, nom, prenom, email, actif, type_compte FROM Utilisateurs");
-        res.json(users);
+        const result = await db.query("SELECT * FROM Utilisateurs");
+        res.json(result.rows); // On retourne uniquement les résultats
     } catch (error) {
         console.error("Erreur serveur :", error);
         res.status(500).json({ error: "Erreur serveur." });
