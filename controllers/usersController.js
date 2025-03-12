@@ -41,13 +41,14 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
         console.log(email, password);
 
-        const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = $", [email]);
+        const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
         if (user.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
 
-        const validPassword = await bcrypt.compare(password, user[0].password);
-        if (!validPassword) {
+        // const validPassword = await bcrypt.compare(password, user[0].password);
+        // if (!validPassword) {
+        if (password == user[0].password) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
 
