@@ -15,25 +15,24 @@ app.get("/", (req, res) => {
   res.send("Bienvenue sur l'API Semaine_campus !");
 });
 
-app.get("/test", (req, res) => {
-  res.json({ message: "Route /test OK : tout fonctionne !" });
+app.get("/healthcheck", (req, res) => {
+  res.json({ message: "Route /healthcheck OK : tout fonctionne !" });
 });
 
 app.use("/api/users", userRoutes);
 app.use("/annonces", annoncesRoutes);
 
-// 🌟 Use the controller instead of direct db.query
 app.get("/api/all-users", userController.getAllUsers);
 
-// Check database connection
-(async () => {
-  try {
-    const [result] = await db.query("SELECT NOW()");
-    console.log("✅ Connexion à la base réussie :", result);
-  } catch (error) {
-    console.error("❌ Erreur de connexion à la base :", error);
-  }
-})();
+
+// (async () => {
+//   try {
+//     const [result] = await db.query("SELECT NOW()");
+//     console.log("✅ Connexion à la base réussie :", result);
+//   } catch (error) {
+//     console.error("❌ Erreur de connexion à la base :", error);
+//   }
+// })();
 
 const port = process.env.PORT || 8080; // ou 3001?
 
