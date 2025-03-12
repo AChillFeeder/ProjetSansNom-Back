@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
         console.log(email, password);
 
-        const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
+        const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = '$1'", [email]);
         if (user.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
