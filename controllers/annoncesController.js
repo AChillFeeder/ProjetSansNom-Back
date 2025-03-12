@@ -3,12 +3,14 @@ const pool = require("../db/db_config");
 // Récupérer toutes les annonces
 exports.getAllAnnonces = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM annonces");
+    const result = await db.query("SELECT * FROM annonces");
+    console.log("Résultat de la requête :", result.rows); // Ajout du log pour vérifier
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+
 
 // Récupérer une annonce par ID
 exports.getAnnonceById = async (req, res) => {
