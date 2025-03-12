@@ -9,8 +9,8 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Tous les champs sont requis." });
         }
 
-        // const [existingUser] = await db.query("SELECT * FROM Utilisateurs WHERE email = ?", [email]);
-        const { rows: existingUser } = await db.query("SELECT * FROM Utilisateurs WHERE email = $1", [email]);
+        // const [existingUser] = await db.query("SELECT * FROM utilisateurs WHERE email = ?", [email]);
+        const { rows: existingUser } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
         if (existingUser.length > 0) {
             return res.status(400).json({ message: "Cet email est déjà utilisé." });
         }
@@ -20,12 +20,12 @@ exports.register = async (req, res) => {
         const type_compte = 1;
 
         // await db.query(
-        //     "INSERT INTO Utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES (?, ?, ?, ?, ?, ?)",
+        //     "INSERT INTO utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES (?, ?, ?, ?, ?, ?)",
         //     [nom, prenom, email, hashedPassword, 1, type_compte]
         // );
 
         await db.query(
-            "INSERT INTO Utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES ($1, $2, $3, $4, $5, $6)",
+            "INSERT INTO utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES ($1, $2, $3, $4, $5, $6)",
             [nom, prenom, email, hashedPassword, 1, type_compte]
         );
 
@@ -39,8 +39,9 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(email, password);
 
-        const { rows: user } = await db.query("SELECT * FROM Utilisateurs WHERE email = $1", [email]);
+        const { rows: user } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
         if (user.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
@@ -59,7 +60,7 @@ exports.login = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM Utilisateurs");
+        const result = await db.query("SELECT * FROM utilisateurs");
         res.json(result.rows); // On retourne uniquement les résultats
     } catch (error) {
         console.error("Erreur serveur :", error);
