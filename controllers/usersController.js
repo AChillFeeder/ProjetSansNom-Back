@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
 
         // const validPassword = await bcrypt.compare(password, user[0].password);
         // if (!validPassword) {
-        if (password == user[0].password) {
+        if (password != user[0].password) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
 
