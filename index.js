@@ -7,7 +7,6 @@ const userController = require("./controllers/usersController");
 const db = require("./db/db_config"); 
 
 const app = express();
-const port = 3001;
 
 app.use(express.json());
 app.use(cors());
@@ -36,6 +35,10 @@ app.get("/api/all-users", userController.getAllUsers);
   }
 })();
 
-app.listen(port, () => {
-  console.log(`🚀 Serveur backend démarré`);
+const port = process.env.PORT || 8080; // ou 3001?
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Serveur backend démarré sur http://0.0.0.0:${port}`);
 });
+
+
