@@ -31,6 +31,7 @@ app.get("/api/all-users", userController.getAllUsers);
 app.get("/api/currentUser", userController.getCurrentUser);
 
 app.get("/api/favoris", favorisController.getFavorites);
+app.post("/api/favoris/:annonceId", favorisController.addFavorite)
 
 app.use("/messages", messagesRoutes);
 
