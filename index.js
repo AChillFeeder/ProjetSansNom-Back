@@ -9,57 +9,67 @@ const userController = require("./controllers/usersController");
 const messagesRoutes = require("./routes/messages");
 
 const app = express();
+const port = process.env.PORT || 8080;
+const server = http.createServer(app);
+
+// ✅ Proper CORS for Express
+app.use(cors({
+    origin: "*", // 🔹 Replace with your frontend URL in production
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json());
-app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Bienvenue sur l'API Semaine_campus !");
+    res.send("Bienvenue sur l'API Semaine_campus !");
 });
 
 app.get("/healthcheck", (req, res) => {
-  res.json({ message: "Route /healthcheck OK : tout fonctionne !" });
+    res.json({ message: "Route /healthcheck OK : tout fonctionne !" });
 });
 
 app.use("/api/users", userRoutes);
 app.use("/api/annonces", annoncesRoutes);
+app.use("/messages", messagesRoutes);
 
 app.get("/api/all-users", userController.getAllUsers);
 app.get("/api/currentUser", userController.getCurrentUser);
 
-app.use("/messages", messagesRoutes);
-
-const port = process.env.PORT || 8080;
-const server = http.createServer(app);
-
-const io = socketIo(server, { cors: { origin: "*" } });
+// ✅ Proper CORS for Socket.io
+const io = socketIo(server, {
+    cors: {
+        origin: "*", // 🔹 Change this to your Clever Cloud frontend URL in production
+        methods: ["GET", "POST"]
+    }
+});
 
 io.on("connection", (socket) => {
-  console.log("Nouvelle connexion socket :", socket.id);
+    console.log("Nouvelle connexion socket :", socket.id);
 
-  socket.on("joinRoom", (roomName) => {
-    socket.join(roomName);
-    console.log(`Socket ${socket.id} a rejoint la salle ${roomName}`);
-  });
+    socket.on("joinRoom", (roomName) => {
+        socket.join(roomName);
+        console.log(`Socket ${socket.id} a rejoint la salle ${roomName}`);
+    });
 
-  socket.on("sendMessage", async (msgData) => {
-    try {
-      const db = require("./db/db_config");
-      const [result] = await db.query(
-        "INSERT INTO Messages (id_sender, id_receiver, message, date_message) VALUES (?, ?, ?, NOW())",
-        [msgData.id_sender, msgData.id_receiver, msgData.message]
-      );
-      msgData.id = result.insertId;
-      const room1 = `${msgData.id_sender}-${msgData.id_receiver}`;
-      const room2 = `${msgData.id_receiver}-${msgData.id_sender}`;
-      io.to(room1).emit("newMessage", msgData);
-      io.to(room2).emit("newMessage", msgData);
-    } catch (err) {
-      console.error("Erreur lors de l'envoi du message :", err);
-    }
-  });
+    socket.on("sendMessage", async (msgData) => {
+        try {
+            const db = require("./db/db_config");
+            const [result] = await db.query(
+                "INSERT INTO Messages (id_sender, id_receiver, message, date_message) VALUES (?, ?, ?, NOW())",
+                [msgData.id_sender, msgData.id_receiver, msgData.message]
+            );
+            msgData.id = result.insertId;
+            const room1 = `${msgData.id_sender}-${msgData.id_receiver}`;
+            const room2 = `${msgData.id_receiver}-${msgData.id_sender}`;
+            io.to(room1).emit("newMessage", msgData);
+            io.to(room2).emit("newMessage", msgData);
+        } catch (err) {
+            console.error("Erreur lors de l'envoi du message :", err);
+        }
+    });
 });
 
 server.listen(port, "0.0.0.0", () => {
-  console.log(`🚀 Serveur backend démarré sur http://0.0.0.0:${port}`);
+    console.log(`🚀 Serveur backend démarré sur http://0.0.0.0:${port}`);
 });
