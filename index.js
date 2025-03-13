@@ -6,7 +6,9 @@ const socketIo = require("socket.io");
 const annoncesRoutes = require("./routes/annonces");
 const userRoutes = require("./routes/users");
 const userController = require("./controllers/usersController");
+const favorisController = require("./controllers/favorisController");
 const messagesRoutes = require("./routes/messages");
+const favorisRoutes = require("./routes/favoris");
 
 const app = express();
 
@@ -23,9 +25,13 @@ app.get("/healthcheck", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/annonces", annoncesRoutes);
+app.use("/api/favoris", favorisRoutes);
 
 app.get("/api/all-users", userController.getAllUsers);
 app.get("/api/currentUser", userController.getCurrentUser);
+
+app.get("/api/favoris", favorisController.getFavorites);
+app.post("/api/favoris/:annonceId", favorisController.addFavorite)
 
 app.use("/messages", messagesRoutes);
 
