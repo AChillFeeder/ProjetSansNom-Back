@@ -30,6 +30,11 @@ exports.createAnnonce = async (req, res) => {
     const { titre_livre, description_annonce, prix, created_by, titre_annonce, etat_livre } = req.body;
     console.log('request body: ', req.body);
 
+    // ! Pour tester, à retirer!!
+    if(!created_by) {
+      created_by = 10;
+    }
+
     // Convertir 'prix' en un nombre valide
     const prixConverted = parseFloat(prix);
 
