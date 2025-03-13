@@ -3,7 +3,7 @@ const pool = require("../db/db_config");
 // Récupérer toutes les annonces
 exports.getAllAnnonces = async (req, res) => {
   try {
-    const result = await pool.query("select * from annonces a LEFT join photo_annonce pa on a.id = pa.id_annonce");
+    const result = await pool.query("select * from annonces a LEFT join photo_annonce pa on a.id = pa.id_annonce order by id asc");
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
