@@ -8,4 +8,7 @@ router.get("/:conversationId", messagesController.getMessagesByConversation);
 
 router.post("/", messagesController.sendMessageHTTP);
 
+router.post("/start-conversation", messagesController.startConversation);
+
+
 module.exports = router;
