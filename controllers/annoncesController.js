@@ -14,7 +14,7 @@ exports.getAllAnnonces = async (req, res) => {
 // Récupérer une annonce par ID
 exports.getAnnonceById = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM annonces WHERE id = $1 limit 500", [req.params.id]);
+    const result = await pool.query("SELECT * FROM annonces WHERE id = $1 and archive = 0 limit 500", [req.params.id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Annonce non trouvée" });
     }
