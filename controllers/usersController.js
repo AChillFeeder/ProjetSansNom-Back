@@ -49,7 +49,10 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
 
-        res.json({ message: "Connexion réussie !" });
+        res.json({
+            message: "Connexion réussie !",
+            userId: user[0].id
+        });
     } catch (error) {
         console.error("Erreur serveur :", error);
         res.status(500).json({ error: "Erreur serveur." });
@@ -58,8 +61,8 @@ exports.login = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM utilisateurs");
-        res.json(result.rows); // On retourne uniquement les résultats
+        const [rows] = await db.query("SELECT * FROM utilisateurs");
+        res.json(rows);
     } catch (error) {
         console.error("Erreur serveur :", error);
         res.status(500).json({ error: "Erreur serveur." });
@@ -111,3 +114,39 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: "Erreur serveur." });
     }
 };
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.headers.userid;
+        if (!userId) {
+            throw new Error("Aucun userId transmis dans les headers.");
+        }
+
+        const [rows] = await db.query(
+            "SELECT id, nom, prenom, email FROM Utilisateurs WHERE id = ?",
+            [userId]
+        );
+
+        if (rows.length === 0) {
+            throw new Error(`Aucun utilisateur trouvé avec l'ID ${userId}`);
+        }
+
+        res.json(rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.getUserById = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const [rows] = await db.query("SELECT id, nom, prenom, email FROM utilisateurs WHERE id = ?", [userId]);
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "Utilisateur non trouvé." });
+      }
+      res.json(rows[0]);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur." });
+    }
+  };
