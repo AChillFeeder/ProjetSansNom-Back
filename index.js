@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const socketIo = require("socket.io");
 
 const annoncesRoutes = require("./routes/annonces");
 const userRoutes = require("./routes/users");
 const userController = require("./controllers/usersController");
-const db = require("./db/db_config"); 
+const messagesRoutes = require("./routes/messages");
 
 const app = express();
 
@@ -23,21 +25,41 @@ app.use("/api/users", userRoutes);
 app.use("/api/annonces", annoncesRoutes);
 
 app.get("/api/all-users", userController.getAllUsers);
+app.get("/api/currentUser", userController.getCurrentUser);
 
+app.use("/messages", messagesRoutes);
 
-// (async () => {
-//   try {
-//     const [result] = await db.query("SELECT NOW()");
-//     console.log("✅ Connexion à la base réussie :", result);
-//   } catch (error) {
-//     console.error("❌ Erreur de connexion à la base :", error);
-//   }
-// })();
+const port = process.env.PORT || 8080;
+const server = http.createServer(app);
 
-const port = process.env.PORT || 8080; // ou 3001?
+const io = socketIo(server, { cors: { origin: "*" } });
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`🚀 Serveur backend démarré sur http://0.0.0.0:${port}`);
+io.on("connection", (socket) => {
+  console.log("Nouvelle connexion socket :", socket.id);
+
+  socket.on("joinRoom", (roomName) => {
+    socket.join(roomName);
+    console.log(`Socket ${socket.id} a rejoint la salle ${roomName}`);
+  });
+
+  socket.on("sendMessage", async (msgData) => {
+    try {
+      const db = require("./db/db_config");
+      const [result] = await db.query(
+        "INSERT INTO Messages (id_sender, id_receiver, message, date_message) VALUES (?, ?, ?, NOW())",
+        [msgData.id_sender, msgData.id_receiver, msgData.message]
+      );
+      msgData.id = result.insertId;
+      const room1 = `${msgData.id_sender}-${msgData.id_receiver}`;
+      const room2 = `${msgData.id_receiver}-${msgData.id_sender}`;
+      io.to(room1).emit("newMessage", msgData);
+      io.to(room2).emit("newMessage", msgData);
+    } catch (err) {
+      console.error("Erreur lors de l'envoi du message :", err);
+    }
+  });
 });
 
-
+server.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Serveur backend démarré sur http://0.0.0.0:${port}`);
+});
