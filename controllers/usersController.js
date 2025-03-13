@@ -9,7 +9,6 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Tous les champs sont requis." });
         }
 
-        // const [existingUser] = await db.query("SELECT * FROM utilisateurs WHERE email = ?", [email]);
         const { rows: existingUser } = await db.query("SELECT * FROM utilisateurs WHERE email = $1", [email]);
         if (existingUser.length > 0) {
             return res.status(400).json({ message: "Cet email est déjà utilisé." });
@@ -18,11 +17,6 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const type_compte = 1;
-
-        // await db.query(
-        //     "INSERT INTO utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES (?, ?, ?, ?, ?, ?)",
-        //     [nom, prenom, email, hashedPassword, 1, type_compte]
-        // );
 
         await db.query(
             "INSERT INTO utilisateurs (nom, prenom, email, password, actif, type_compte) VALUES ($1, $2, $3, $4, $5, $6)",
@@ -49,9 +43,9 @@ exports.login = async (req, res) => {
         console.log('Found user');
         console.log(password, user[0].password);
 
-        // const validPassword = await bcrypt.compare(password, user[0].password);
-        // if (!validPassword) {
-        if (password != user[0].password) {
+        const validPassword = await bcrypt.compare(password, user[0].password);
+        if (!validPassword) {
+        // if (password != user[0].password) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect." });
         }
 
