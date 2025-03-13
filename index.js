@@ -6,7 +6,9 @@ const socketIo = require("socket.io");
 const annoncesRoutes = require("./routes/annonces");
 const userRoutes = require("./routes/users");
 const userController = require("./controllers/usersController");
+const favorisController = require("./controllers/favorisController");
 const messagesRoutes = require("./routes/messages");
+const favorisRoutes = require("./routes/favoris");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -36,7 +38,9 @@ app.use("/messages", messagesRoutes);
 app.get("/api/all-users", userController.getAllUsers);
 app.get("/api/currentUser", userController.getCurrentUser);
 
-// ✅ Proper CORS for Socket.io
+app.get("/api/favoris", favorisController.getFavorites);
+app.post("/api/favoris/:annonceId", favorisController.addFavorite)// ✅ Proper CORS for Socket.io
+
 const io = socketIo(server, {
     cors: {
         origin: "*", // 🔹 Change this to your Clever Cloud frontend URL in production
