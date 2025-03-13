@@ -30,10 +30,8 @@ exports.createAnnonce = async (req, res) => {
     const { titre_livre, description_annonce, prix, created_by, titre_annonce, etat_livre } = req.body;
     console.log('request body: ', req.body);
 
-    // Convertir 'prix' en un nombre valide
     const prixConverted = parseFloat(prix);
 
-    // Vérifier que 'prix' est un nombre valide
     if (isNaN(prixConverted)) {
       return res.status(400).json({ message: "Prix invalide, veuillez fournir un nombre valide." });
     }
